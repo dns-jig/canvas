@@ -72,18 +72,29 @@
     const SUPABASE_URL = 'https://eyjznvdwygrmwtwcitah.supabase.co';
     const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImV5anpudmR3eWdybXd0d2NpdGFoIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Njc3NTU4MTYsImV4cCI6MjA4MzMzMTgxNn0.peEYldCsD4bN6eELGZ0i6KUmdGu8BQO3ne6bEZtB9IM';
     
-    const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
-        
     async function login() {
-        const emailInput = document.getElementById('email');
-        const passwordInput = document.getElementById('password');
+        // 1. SELECT ALL ELEMENTS FIRST
+        const emailEl = document.getElementById('email');
+        const passwordEl = document.getElementById('password');
         const messageBox = document.getElementById('message');
 
-        const emailValue = emailInput.value;
-        const passwordValue = passwordInput.value;
-        
-        messageBox.innerText = "Verifying...";
+        // 2. CHECK IF THEY EXIST (Safety Check)
+        if (!emailEl || !passwordEl) {
+            alert("Error: HTML is missing input fields with id='email' or id='password'");
+            return;
+        }
+
+        // 3. START THE LOGIN PROCESS
+        const emailValue = emailEl.value;
+        const passwordValue = passwordEl.value;
+
+        // Use the messageBox only if it exists, otherwise use alert
+        if (messageBox) {
+            messageBox.innerText = "Verifying...";
+            messageBox.style.color = "white";
+        }
 
         try {
             const { data, error } = await supabaseClient.auth.signInWithPassword({
@@ -92,21 +103,23 @@
             });
 
             if (error) {
-                messageBox.innerText = "Error: " + error.message;
-                messageBox.style.color = "#ff4d4d";
+                if (messageBox) {
+                    messageBox.innerText = "Error: " + error.message;
+                    messageBox.style.color = "#ff4d4d";
+                } else {
+                    alert("Login Error: " + error.message);
+                }
             } else {
-                messageBox.innerText = "Success! Redirecting...";
-                messageBox.style.color = "#88bbff";
+                if (messageBox) messageBox.innerText = "Success! Redirecting...";
                 
-                // --- REDIRECT LOGIC ---
-                // Wait 1 second so the user can see the success message, then move
+                // Move to the protected page
                 setTimeout(() => {
                     window.location.href = "dashboard.html"; 
                 }, 1000);
             }
         } catch (err) {
-            console.error("Critical error:", err);
-            messageBox.innerText = "An unexpected error occurred.";
+            console.error("Critical System Error:", err);
+            alert("An unexpected error occurred. Check the console.");
         }
     }
 </script>
