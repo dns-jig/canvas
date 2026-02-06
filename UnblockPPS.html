@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Unblock PPS</title>
+    <link rel="icon" type="image/x-icon" href="https://raw.githubusercontent.com/dns-jig/canvas/refs/heads/main/ubologo.png">
+<style>
+    /* Remove default margins and hide body scrollbars */
+    body, html {
+        margin: 0;
+        padding: 0;
+        height: 100%;
+        width: 100%;
+        overflow: hidden; 
+    }
+
+    #container {
+        height: 100vh;
+        width: 100vw;
+    }
+
+    iframe {
+        width: 100%;
+        height: 100%;
+        border: none;
+        display: none; /* Stays hidden until JS loads the URL */
+    }
+</style>
+</head>
+<body>
+
+<div id="container">
+        <iframe id="dynamic-iframe"></iframe>
+</div>
+
+<script>
+    // 1. Replace this with your actual GitHub Raw URL
+    const rawUrl = 'https://raw.githubusercontent.com/dns-jig/canvas/refs/heads/main/link.txt';
+
+    async function loadIframe() {
+        try {
+            const response = await fetch(rawUrl);
+            
+            if (!response.ok) throw new Error('Network response was not ok');
+            
+            // 2. Get the link text from the file
+            const targetUrl = await response.text();
+            
+            // 3. Set the iframe source and make it visible
+            const iframe = document.getElementById('dynamic-iframe');
+            iframe.src = targetUrl.trim(); // .trim() removes any accidental line breaks
+            iframe.style.display = "block";
+            
+            document.querySelector('h2').innerText = "Content Loaded from GitHub Link";
+            
+        } catch (error) {
+            console.error('Fetch error:', error);
+            document.querySelector('h2').innerText = "Failed to load link from GitHub.";
+        }
+    }
+
+    loadIframe();
+</script>
+
+</body>
+</html>
