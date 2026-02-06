@@ -62,64 +62,37 @@
         <h2>Sign In</h2>
         <input type="text" id="email" placeholder="Email/Username">
         <input type="password" id="password" placeholder="Password">
-        <button type="button" onclick="login()">Log In</button>
+        <button type="button" onclick="loginUser()">Log In</button>
         
         <p id="message"></p>
     </div>
+<script>
+    // Initialize Supabase
+const _supabase = supabase.createClient('https://jawxmetkycxlczqudtbu.supabase.co', 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imphd3htZXRreWN4bGN6cXVkdGJ1Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzAyNTczNjksImV4cCI6MjA4NTgzMzM2OX0.LjjdeOjvOFrpbAKCez9YRk3SZKhWSGXlulQJf1HCOFQ');
 
-    <script>
+async function loginUser(e) {
+        // Prevent the page from refreshing (important for forms!)
+        if (e) e.preventDefault();
 
-    const SUPABASE_URL = 'https://eyjznvdwygrmwtwcitah.supabase.co';
-    const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImV5anpudmR3eWdybXd0d2NpdGFoIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Njc3NTU4MTYsImV4cCI6MjA4MzMzMTgxNn0.peEYldCsD4bN6eELGZ0i6KUmdGu8BQO3ne6bEZtB9IM';
-    
-const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+        const email = document.getElementById('email').value;
+        const password = document.getElementById('password').value;
 
-    async function login() {
-        // 1. SELECT ALL ELEMENTS FIRST
-        const emailEl = document.getElementById('email');
-        const passwordEl = document.getElementById('password');
-        const messageBox = document.getElementById('message');
+        // Call the login function
+        const { data, error } = await _supabase.auth.signInWithPassword({
+            email: email,
+            password: password
+        });
 
-        // 2. CHECK IF THEY EXIST (Safety Check)
-        if (!emailEl || !passwordEl) {
-            alert("Error: HTML is missing input fields with id='email' or id='password'");
-            return;
-        }
-
-        // 3. START THE LOGIN PROCESS
-        const emailValue = emailEl.value;
-        const passwordValue = passwordEl.value;
-
-        // Use the messageBox only if it exists, otherwise use alert
-        if (messageBox) {
-            messageBox.innerText = "Verifying...";
-            messageBox.style.color = "white";
-        }
-
-        try {
-            const { data, error } = await supabaseClient.auth.signInWithPassword({
-                email: emailValue,
-                password: passwordValue,
-            });
-
-            if (error) {
-                if (messageBox) {
-                    messageBox.innerText = "Error: " + error.message;
-                    messageBox.style.color = "#ff4d4d";
-                } else {
-                    alert("Login Error: " + error.message);
-                }
-            } else {
-                if (messageBox) messageBox.innerText = "Success! Redirecting...";
-                
-                // Move to the protected page
-                setTimeout(() => {
-                    window.location.href = "main.html"; 
-                }, 1000);
-            }
-        } catch (err) {
-            console.error("Critical System Error:", err);
-            alert("An unexpected error occurred. Check the console.");
+        if (error) {
+            alert("Login Error: " + error.message);
+            console.error(error);
+        } else {
+            console.log("Success! Session created.");
+            
+            // Wait 500ms to ensure the browser saves the auth token to local storage
+            setTimeout(() => {
+                window.location.href = 'main.html';
+            }, 500);
         }
     }
 </script>
